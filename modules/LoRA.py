@@ -2,19 +2,12 @@ from pathlib import Path
 
 import torch
 from peft import PeftModel
+from transformers import is_torch_xpu_available
 
 import modules.shared as shared
 from modules.logging_colors import logger
 from modules.models import reload_model
 
-
-def merge_loras():
-    if len(list({shared.model.peft_config[adapter].r for adapter in shared.model.peft_config.keys()})) > 1:
-        logger.warning("The loaded LoRAs cannot be merged, as they have dissimilar ranks. Only the first one will be active.")
-        return
-
-    shared.model.add_weighted_adapter(shared.lora_names, [1] * len(shared.lora_names), "__merged")
-    shared.model.set_adapter("__merged")
 
 def add_lora_to_model(lora_names):
     if 'GPTQForCausalLM' in shared.model.__class__.__name__ or shared.args.loader == 'AutoGPTQ':
@@ -187,5 +180,17 @@ def add_lora_transformers(lora_names):
                 if torch.backends.mps.is_available():
                     device = torch.device('mps')
                     shared.model = shared.model.to(device)
+                elif is_torch_xpu_available():
+                    device = torch.device("xpu:0")
+                    shared.model = shared.model.to(device)
                 else:
                     shared.model = shared.model.cuda()
+
+
+def merge_loras():
+    if len(list({shared.model.peft_config[adapter].r for adapter in shared.model.peft_config.keys()})) > 1:
+        logger.warning("The loaded LoRAs cannot be merged, as they have dissimilar ranks. Only the first one will be active.")
+        return
+
+    shared.model.add_weighted_adapter(shared.lora_names, [1] * len(shared.lora_names), "__merged")
+    shared.model.set_adapter("__merged")

@@ -26,6 +26,7 @@ from peft import (
 )
 from peft.utils.other import \
     TRANSFORMERS_MODELS_TO_LORA_TARGET_MODULES_MAPPING as model_to_lora_modules
+from transformers import is_torch_xpu_available
 from transformers.models.auto.modeling_auto import (
     MODEL_FOR_CAUSAL_LM_MAPPING_NAMES
 )
@@ -55,7 +56,7 @@ def create_ui():
             tmp = gr.State('')
             with gr.Row():
                 with gr.Column():
-                    gr.Markdown("[Tutorial](https://github.com/oobabooga/text-generation-webui/blob/main/docs/Training-LoRAs.md)")
+                    gr.Markdown("[Tutorial](https://github.com/oobabooga/text-generation-webui/wiki/05-%E2%80%90-Training-Tab)")
 
                     with gr.Row():
                         copy_from = gr.Dropdown(label='Copy parameters from', value='None', choices=utils.get_available_loras(), elem_classes=['slim-dropdown'], interactive=not mu)
@@ -174,7 +175,7 @@ def create_ui():
                 with gr.Column():
                     evaluation_log = gr.Markdown(value='')
 
-            evaluation_table = gr.Dataframe(value=generate_markdown_table(), interactive=True, height=16000, elem_id='evaluation-table')
+            evaluation_table = gr.Dataframe(value=generate_markdown_table(), interactive=True)
             with gr.Row():
                 save_comments = gr.Button('Save comments', elem_classes="small-button", interactive=not mu)
                 refresh_table = gr.Button('Refresh the table', elem_classes="small-button", interactive=not mu)
@@ -543,7 +544,7 @@ def do_train(lora_name: str, always_override: bool, q_proj_en: bool, v_proj_en: 
         lora_model = get_peft_model(shared.model, config)
         if not always_override and Path(f"{lora_file_path}/adapter_model.bin").is_file():
             logger.info("Loading existing LoRA data...")
-            state_dict_peft = torch.load(f"{lora_file_path}/adapter_model.bin")
+            state_dict_peft = torch.load(f"{lora_file_path}/adapter_model.bin", weights_only=True)
             set_peft_model_state_dict(lora_model, state_dict_peft)
     except:
         yield traceback.format_exc().replace('\n', '\n\n')
@@ -626,6 +627,7 @@ def do_train(lora_name: str, always_override: bool, q_proj_en: bool, v_proj_en: 
             # TODO: Enable multi-device support
             ddp_find_unused_parameters=None,
             no_cuda=shared.args.cpu,
+            use_ipex=True if is_torch_xpu_available and not shared.args.cpu else False
         ),
         data_collator=transformers.DataCollatorForLanguageModeling(shared.tokenizer, mlm=False),
         callbacks=list([Callbacks()])
