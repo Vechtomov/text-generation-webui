@@ -23,7 +23,7 @@ options = {
 }
 
 
-def ui():
+def setup():
     settings = shared.settings.get("ngrok")
     if settings:
         options.update(settings)
@@ -31,6 +31,6 @@ def ui():
     try:
         import ngrok
         tunnel = ngrok.connect(**options)
-        logging.info(f"Ingress established at: {tunnel.url()}")
+        print(f"Ingress established at: {tunnel.url()}")
     except ModuleNotFoundError:
-        logging.error("===> ngrok library not found, please run `pip install -r extensions/ngrok/requirements.txt`")
+        print("===> ngrok library not found, please run `pip install -r extensions/ngrok/requirements.txt`")

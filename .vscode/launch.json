@@ -1,0 +1,45 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Server",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\server.py",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "--model-dir",
+                "${workspaceFolder}\\models",
+                "--model",
+                // "mistral-7b-openorca.Q4_0.gguf",
+                // "causallm_14b.Q4_0.gguf",
+                // "openhermes-2-mistral-7b.Q4_0.gguf",
+                // "zephyr-7b-beta.Q5_K_M.gguf",
+                // "dolphin-2.2.1-mistral-7b.Q5_K_M.gguf",
+                // "agentlm-7b.Q5_K_M.gguf",
+                // "TheBloke\\OpenHermes-2.5-Mistral-7B-GGUF\\openhermes-2.5-mistral-7b.Q5_K_M.gguf",
+                "openchat_3.5.Q5_K_M.gguf",
+                "--n_ctx",
+                "8192",
+                // "2048",
+                "--n-gpu-layers",
+                "1000000000",
+                "--api",
+                "--extensions",
+                "openai",
+                // "ngrok"
+            ],
+            "justMyCode": false,
+            "python": "${command:python.interpreterPath}",
+        },
+        {
+            "name": "Current",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "python": "${command:python.interpreterPath}",
+            "justMyCode": false
+        }
+    ]
+}

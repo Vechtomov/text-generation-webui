@@ -167,8 +167,8 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
             instruct = yaml.safe_load(open(f"instruction-templates/{shared.settings['instruction_template']}.yaml", 'r'))
 
             template = instruct['turn_template']
-            system_message_template = "{message}"
-            system_message_default = instruct.get('context', '')  # can be missing
+            system_message_template = instruct.get('system', '').replace('<|system-message|>', '{message}') or '{message}'
+            context_message_template = instruct.get('context', '').replace('<|context-message|>', '{message}') or '{message}'  # can be missing
             bot_start = template.find('<|bot|>')  # So far, 100% of instruction templates have this token
             user_message_template = template[:bot_start].replace('<|user-message|>', '{message}').replace('<|user|>', instruct.get('user', ''))
             bot_message_template = template[bot_start:].replace('<|bot-message|>', '{message}').replace('<|bot|>', instruct.get('bot', ''))
@@ -178,11 +178,13 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
                 'user': user_message_template,
                 'assistant': bot_message_template,
                 'system': system_message_template,
-                'context': system_message_default,
+                'context': context_message_template,
                 'prompt': bot_prompt,
             }
 
-            if 'Alpaca' in shared.settings['instruction_template']:
+            if 'stopping_strings' in instruct:
+                req_params['stopping_strings'].extend(instruct['stopping_strings'])
+            elif 'Alpaca' in shared.settings['instruction_template']:
                 req_params['stopping_strings'].extend(['\n###'])
             elif instruct['user']:  # WizardLM and some others have no user prompt.
                 req_params['stopping_strings'].extend(['\n' + instruct['user'], instruct['user']])
@@ -203,8 +205,9 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
     chat_msgs = []
 
     # You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible. Knowledge cutoff: {knowledge_cutoff} Current date: {current_date}
-    context_msg = role_formats['system'].format(message=role_formats['context']) if role_formats['context'] else ''
-    context_msg = end_line(context_msg)
+    # context_msg = role_formats['system'].format(message=role_formats['context']) if role_formats['context'] else ''
+    # context_msg = end_line(context_msg)
+    context_msg = ''
 
     # Maybe they sent both? This is not documented in the API, but some clients seem to do this.
     if 'prompt' in body:

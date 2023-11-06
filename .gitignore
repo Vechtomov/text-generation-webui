@@ -28,7 +28,6 @@
 .idea
 .venv
 venv
-.vscode
 *.bak
 *.ipynb
 *.log
@@ -39,3 +38,4 @@ package.json
 package-lock.json
 Thumbs.db
 wandb
+.env

@@ -1,7 +1,6 @@
 user: "user"
 bot: "assistant"
-context: |
-  <|im_start|>system
-  <|im_end|>
+context: "<|im_start|>system\n<|context-message|><|im_end|>"
+system: "<|im_start|>system\n<|system-message|><|im_end|>"
 turn_template: "<|im_start|><|user|>\n<|user-message|><|im_end|>\n<|im_start|><|bot|>\n<|bot-message|><|im_end|>\n"
-
+stopping_strings: ["<|im_start|>", "<|im_end|>"]

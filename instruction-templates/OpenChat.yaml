@@ -1,4 +1,6 @@
-user: "GPT4 User:"
-bot: "GPT4 Assistant:"
+user: "GPT4 Correct User:"
+bot: "GPT4 Correct Assistant:"
 turn_template: "<|user|> <|user-message|><|end_of_turn|><|bot|> <|bot-message|><|end_of_turn|>"
-context: ""
+context: "<|context-message|><|end_of_turn|>"
+system: "<|system-message|><|end_of_turn|>"
+stopping_strings: ["</s>", "<|end_of_turn|>"]
