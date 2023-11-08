@@ -1,7 +1,6 @@
 /cache
 /characters
 /css
-/extensions
 /grammars
 /installer_files
 /logs
@@ -21,6 +20,7 @@
 /notification.mp3
 /settings*.json
 /settings*.yaml
+
 
 .chroma
 .DS_Store

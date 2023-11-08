@@ -6,11 +6,12 @@ import torch.nn.functional as F
 import yaml
 from extensions.openai.defaults import clamp, default, get_default_req_params
 from extensions.openai.errors import InvalidRequestError
+from extensions.openai.functions_to_grammar import parse_functions
 from extensions.openai.utils import debug_msg, end_line
 from modules import shared
 from modules.text_generation import decode, encode, generate_reply
 from transformers import LogitsProcessor, LogitsProcessorList
-
+import json
 
 # Thanks to @Cypherfox [Cypherfoxy] for the logits code, blame to @matatonic
 class LogitsBiasProcessor(LogitsProcessor):
@@ -140,10 +141,16 @@ def marshal_common_params(body):
 
 def messages_to_prompt(body: dict, req_params: dict, max_tokens):
     # functions
-    if body.get('functions', []):  # chat only
-        raise InvalidRequestError(message="functions is not supported.", param='functions')
-    if body.get('function_call', ''):  # chat only, 'none', 'auto', {'name': 'func'}
-        raise InvalidRequestError(message="function_call is not supported.", param='function_call')
+    # if body.get('functions', []):  # chat only
+    #     raise InvalidRequestError(message="functions is not supported.", param='functions')
+    # if body.get('function_call', ''):  # chat only, 'none', 'auto', {'name': 'func'}
+    #     raise InvalidRequestError(message="function_call is not supported.", param='function_call')
+
+    functions = body.get('functions', [])
+    if functions:
+        grammar = parse_functions(body.get('functions'))
+        req_params["grammar_string"] = grammar
+        req_params["functions"] = functions
 
     if 'messages' not in body:
         raise InvalidRequestError(message="messages is required", param='messages')
@@ -294,6 +301,16 @@ def chat_completions(body: dict, is_legacy: bool = False) -> dict:
     if answer and answer[0] == ' ':
         answer = answer[1:]
 
+    message = {"role": "assistant", "content": answer}
+
+    if "functions" in req_params:
+        try:
+            function_call = json.loads(answer)
+            if function_call["function"]:
+                message["function_call"] = {"name": function_call["function"], "arguments": json.dumps(function_call["arguments"], indent=2)}
+        except:
+            pass
+
     completion_token_count = len(encode(answer)[0])
     stop_reason = "stop"
     if token_count + completion_token_count >= req_params['truncation_length'] or completion_token_count >= req_params['max_new_tokens']:
@@ -307,7 +324,7 @@ def chat_completions(body: dict, is_legacy: bool = False) -> dict:
         resp_list: [{
             "index": 0,
             "finish_reason": stop_reason,
-            "message": {"role": "assistant", "content": answer}
+            "message": message
         }],
         "usage": {
             "prompt_tokens": token_count,
