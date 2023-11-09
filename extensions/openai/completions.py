@@ -138,6 +138,21 @@ def marshal_common_params(body):
 
     return req_params
 
+def get_technical_function():
+    return {
+            "name": "message_to_user",
+            "description": "Sends a message to user",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Message",
+                    },
+                },
+                "required": ["message"],
+            },
+        }
 
 def messages_to_prompt(body: dict, req_params: dict, max_tokens):
     # functions
@@ -146,11 +161,14 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
     # if body.get('function_call', ''):  # chat only, 'none', 'auto', {'name': 'func'}
     #     raise InvalidRequestError(message="function_call is not supported.", param='function_call')
 
-    functions = body.get('functions', [])
+    functions: list = body.get('functions', [])
     if functions:
+        original_functions = functions.copy()
+        functions.append(get_technical_function())
         grammar = parse_functions(body.get('functions'))
         req_params["grammar_string"] = grammar
-        req_params["functions"] = functions
+        req_params["functions"] = original_functions
+
 
     if 'messages' not in body:
         raise InvalidRequestError(message="messages is required", param='messages')
@@ -180,7 +198,8 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
             user_message_template = template[:bot_start].replace('<|user-message|>', '{message}').replace('<|user|>', instruct.get('user', ''))
             bot_message_template = template[bot_start:].replace('<|bot-message|>', '{message}').replace('<|bot|>', instruct.get('bot', ''))
             bot_prompt = bot_message_template[:bot_message_template.find('{message}')].rstrip(' ')
-            function_message_template = instruct.get('function', '').replace('<|message|>', '{message}') or '{message}'
+            functions_message_template = instruct.get('functions', '') or '<|functions|>'
+            function_call_message_template = instruct.get('function_call', '').replace('<|message|>', '{message}') or '{message}'
 
             role_formats = {
                 'user': user_message_template,
@@ -188,7 +207,8 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
                 'system': system_message_template,
                 'context': context_message_template,
                 'prompt': bot_prompt,
-                'function': function_message_template
+                'functions': functions_message_template,
+                'function': function_call_message_template
             }
 
             if 'stopping_strings' in instruct:
@@ -221,6 +241,9 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
     # Maybe they sent both? This is not documented in the API, but some clients seem to do this.
     if 'prompt' in body:
         context_msg = end_line(role_formats['system'].format(message=body['prompt'])) + context_msg
+
+    if functions:
+        system_msgs.append(role_formats['functions'].replace('<|functions|>', json.dumps(functions, indent=2)))
 
     for m in messages:
         if 'role' not in m:
@@ -309,7 +332,11 @@ def chat_completions(body: dict, is_legacy: bool = False) -> dict:
         try:
             function_call = json.loads(answer)
             if function_call["function"]:
-                message["function_call"] = {"name": function_call["function"], "arguments": json.dumps(function_call["arguments"], indent=2)}
+                function_name = function_call["function"]
+                if function_name in set(map(lambda x: x["name"], req_params["functions"])):
+                    message["function_call"] = {"name": function_name, "arguments": json.dumps(function_call["arguments"], indent=2)}
+                else:
+                    message["content"] = function_call["arguments"]["message"]
         except:
             pass
 

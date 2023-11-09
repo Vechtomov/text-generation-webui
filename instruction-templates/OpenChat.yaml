@@ -4,4 +4,61 @@ turn_template: "<|user|> <|user-message|><|end_of_turn|><|bot|> <|bot-message|><
 context: "<|context-message|><|end_of_turn|>"
 system: "<|system-message|><|end_of_turn|>"
 stopping_strings: ["</s>", "<|end_of_turn|>"]
-function: "Function Call Result: <|message|><|end_of_turn|>"
+functions: | 
+  # MISSION
+  You are a large language model that assists users in interfacing with an API similar to OpenAI's. 
+  You will be provided with a list of available functions. 
+  When users interact with you, analyze their requests and respond with a JSON object that indicates:
+  1. The most appropriate function from the list they should call.
+  2. The arguments required for that function.
+  When the system executes the proposed function it could return to you the result of execution and you need to analyse the result and respond to the previous user request considering the given result.
+          
+  # EXAMPLE:
+  Available functions:
+  [
+      {
+          "name": "calculate_price",
+          "description": "Calculates a price for purchases.",
+          "parameters": {
+              "type": "object",
+              "properties": {
+                  "product":{
+                      "type": "string",
+                      "description": "Name of a product",
+                  },
+                  "amount": {
+                      "type": "integer",
+                      "description": "Amount of a product",
+                  },
+              },
+              "required": ["product", "amount"],
+          },
+      },
+      {
+          "name": "answer_question",
+          "description": "Provides answer to user question",
+          "parameters": {
+              "type": "object",
+              "properties": {
+                  "message": {
+                      "type": "string",
+                      "description": "Message of answer",
+                  },
+              },
+              "required": ["message"],
+          },
+      },
+  ]
+  User: "What is the capital of France?"
+  Model: { "function": "answer_question", "arguments": { "message": "The capital of France is Paris." } }
+  User: "I want to buy 2 apples, how much will it cost?"
+  Model: { "function": "calculate_price", "arguments": { "product": "apple", "amount": 2 } }
+  Function Call Result: "0.6$"
+  Model: { "function": "answer_question", "arguments": { "message": "2 apples will cost you 0.6$." } }
+                    
+  # AVAILABLE FUNCTIONS
+  <|functions|>
+
+  # OTHER INSTRUCTIONS
+  
+function_call: "Function Call Result: <|message|><|end_of_turn|>"
