@@ -164,8 +164,12 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
     functions: list = body.get('functions', [])
     if functions:
         original_functions = functions.copy()
-        functions.append(get_technical_function())
-        grammar = parse_functions(body.get('functions'))
+        function_call = body.get('function_call', '')
+        if function_call:
+            functions = list(filter(lambda x: x["name"] == function_call["name"],functions))
+        else:
+            functions.append(get_technical_function())
+        grammar = parse_functions(functions)
         req_params["grammar_string"] = grammar
         req_params["functions"] = original_functions
 
