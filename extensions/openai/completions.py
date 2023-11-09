@@ -180,6 +180,7 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
             user_message_template = template[:bot_start].replace('<|user-message|>', '{message}').replace('<|user|>', instruct.get('user', ''))
             bot_message_template = template[bot_start:].replace('<|bot-message|>', '{message}').replace('<|bot|>', instruct.get('bot', ''))
             bot_prompt = bot_message_template[:bot_message_template.find('{message}')].rstrip(' ')
+            function_message_template = instruct.get('function', '').replace('<|message|>', '{message}') or '{message}'
 
             role_formats = {
                 'user': user_message_template,
@@ -187,6 +188,7 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
                 'system': system_message_template,
                 'context': context_message_template,
                 'prompt': bot_prompt,
+                'function': function_message_template
             }
 
             if 'stopping_strings' in instruct:
@@ -233,8 +235,8 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
         msg = role_formats[role].format(message=content)
         if role == 'system':
             system_msgs.extend([msg])
-        elif role == 'function':
-            raise InvalidRequestError(message="role: function is not supported.", param='messages')
+        # elif role == 'function':
+        #     raise InvalidRequestError(message="role: function is not supported.", param='messages')
         else:
             chat_msgs.extend([msg])
 

@@ -4,3 +4,4 @@ turn_template: "<|user|> <|user-message|><|end_of_turn|><|bot|> <|bot-message|><
 context: "<|context-message|><|end_of_turn|>"
 system: "<|system-message|><|end_of_turn|>"
 stopping_strings: ["</s>", "<|end_of_turn|>"]
+function: "Function Call Result: <|message|><|end_of_turn|>"

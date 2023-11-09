@@ -15,7 +15,6 @@ class JSONFunctionStructure:
 def to_json_structure(functions):
     js = JSONFunctionStructure()
     for function in functions:
-        # Assuming 'properties' and '$defs' are keys in the function's parameters.
         properties = function.parameters.get("properties", {})
         js.oneOf.append({
             "type": "object",
@@ -34,7 +33,7 @@ def parse_functions(function_list):
     # function_list = json.loads(json_data)
     functions = [Function(f['name'], f['description'], f['parameters']) for f in function_list]
     json_structure = to_json_structure(functions)
-    prop_order = {name: idx for idx, name in enumerate("function,arguments")}
+    prop_order = {name: idx for idx, name in enumerate(["function","arguments"])}
     converter = SchemaConverter(prop_order)
     converter.visit(json_structure, '')
     return converter.format_grammar()
