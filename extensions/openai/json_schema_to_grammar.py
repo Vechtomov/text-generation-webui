@@ -48,13 +48,22 @@ class SchemaConverter:
         return key
 
     def visit(self, schema, name):
-        schema_type = schema.get('type')
+        try:
+            schema_type = schema.get('type')
+        except Exception as e:
+            print(e)
+            raise e
         rule_name = name or 'root'
 
         if 'oneOf' in schema or 'anyOf' in schema:
+            try:
+                oneOf = schema.get('oneOf') or schema['anyOf']
+            except Exception as e:
+                print(e)
+                raise e
             rule = ' | '.join((
                 self.visit(alt_schema, f'{name}{"-" if name else ""}{i}')
-                for i, alt_schema in enumerate(schema.get('oneOf') or schema['anyOf'])
+                for i, alt_schema in enumerate(oneOf)
             ))
             return self._add_rule(rule_name, rule)
 
@@ -68,11 +77,11 @@ class SchemaConverter:
         elif schema_type == 'object' and 'properties' in schema:
             # TODO: `required` keyword
             prop_order = self._prop_order
-            prop_pairs = sorted(
-                schema['properties'].items(),
-                # sort by position in prop_order (if specified) then by key
-                key=lambda kv: (prop_order.get(kv[0], len(prop_order)), kv[0]),
-            )
+            prop_pairs = list(map(lambda x: x[1], sorted(
+                enumerate(schema['properties'].items()),
+                # sort by position in prop_order (if specified) then by item number
+                key=lambda kv: (prop_order.get(kv[1][0], len(prop_order)), kv[0]),
+            )))
 
             rule = '"{" space'
             for i, (prop_name, prop_schema) in enumerate(prop_pairs):
