@@ -12,7 +12,7 @@ from modules import shared
 from modules.text_generation import decode, encode, generate_reply
 from transformers import LogitsProcessor, LogitsProcessorList
 import json
-
+import traceback
 
 # Thanks to @Cypherfox [Cypherfoxy] for the logits code, blame to @matatonic
 class LogitsBiasProcessor(LogitsProcessor):
@@ -339,7 +339,8 @@ def messages_to_prompt(body: dict, req_params: dict, max_tokens):
             msg = role_formats[role].format(message=content)
             chat_msgs.append(msg)
 
-    system_msg += role_formats["system"].format(message="\n".join(system_msgs))
+    if len(system_msgs) > 0:
+        system_msg += role_formats["system"].format(message="\n".join(system_msgs))
 
     prompt = system_msg + context_msg + "".join(chat_msgs) + role_formats["prompt"]
 
@@ -408,6 +409,8 @@ def chat_completions(body: dict, is_legacy: bool = False) -> dict:
         answer = answer[1:]
 
     message = {"role": "assistant", "content": answer}
+    
+    print(answer)
 
     if "functions" in req_params:
         try:
@@ -417,6 +420,7 @@ def chat_completions(body: dict, is_legacy: bool = False) -> dict:
                 if function_name in set(
                     map(lambda x: x["name"], req_params["functions"])
                 ):
+                    # message["content"] = None
                     message["function_call"] = {
                         "name": function_name,
                         "arguments": json.dumps(function_call["arguments"], indent=2),
@@ -424,7 +428,7 @@ def chat_completions(body: dict, is_legacy: bool = False) -> dict:
                 else:
                     message["content"] = function_call["arguments"]["message"]
         except:
-            pass
+            print(traceback.format_exc())
 
     completion_token_count = len(encode(answer)[0])
     stop_reason = "stop"

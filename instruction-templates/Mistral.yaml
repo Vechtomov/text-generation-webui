@@ -1,4 +1,6 @@
 user: ""
 bot: ""
 turn_template: "[INST] <|user|><|user-message|> [/INST]<|bot|><|bot-message|></s> "
-context: ""
+context: "[INST] <|context-message|> [/INST]</s>"
+system: "[INST] <|system-message|> [/INST]</s>"
+stopping_strings: ["</s>"]
