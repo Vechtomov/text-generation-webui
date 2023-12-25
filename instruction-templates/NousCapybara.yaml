@@ -1,9 +1,9 @@
-user: "user"
-bot: "assistant"
-context: "<|im_start|>system\n<|context-message|><|im_end|>"
-system: "<|im_start|>system\n<|system-message|><|im_end|>"
-turn_template: "<|im_start|><|user|>\n<|user-message|><|im_end|>\n<|im_start|><|bot|>\n<|bot-message|><|im_end|>\n"
-stopping_strings: ["<|im_start|>", "<|im_end|>"]
+user: "USER:"
+bot: "ASSISTANT:"
+context: "<|context-message|>\n"
+system: "<|system-message|>\n"
+turn_template: "<|user|>\n<|user-message|>\n<|bot|>\n<|bot-message|>\n"
+stopping_strings: ["USER:", "</s>"]
 functions: | 
   # MISSION
   You are a large language model that assists users in interfacing with an API similar to OpenAI's. 
@@ -61,4 +61,4 @@ functions: |
 
   # OTHER INSTRUCTIONS
   
-function_call: "<|im_start|>user\n<|message|><|im_end|>"
+function_call: "<user>\n<|message|>\n"

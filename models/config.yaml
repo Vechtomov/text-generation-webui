@@ -188,3 +188,5 @@
   instruction_template: 'ChatML'
 .*agentlm.*:
   instruction_template: 'ChatML'
+.*deepseek.*:
+  instruction_template: 'DeepSeekCoder'

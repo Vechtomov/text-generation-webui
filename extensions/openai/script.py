@@ -48,9 +48,15 @@ class Handler(BaseHTTPRequestHandler):
             "Access-Control-Allow-Headers",
             "Origin, Accept, X-Requested-With, Content-Type, "
             "Access-Control-Request-Method, Access-Control-Request-Headers, "
-            "Authorization"
+            "Authorization, "
+            'X-Stainless-Arch, ' 
+            'X-Stainless-Lang, ' 
+            'X-Stainless-Os, '
+            'X-Stainless-Package-Version, ' 
+            'X-Stainless-Runtime, ' 
+            'X-Stainless-Runtime-Version'
         )
-
+        
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_access_control_headers()

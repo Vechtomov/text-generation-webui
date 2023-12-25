@@ -9,32 +9,43 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 "--model-dir",
-                "${workspaceFolder}\\models",
+                // "${workspaceFolder}\\models",
+                
+                "D:\\models",
+
                 "--model",
-                "..\\..\\llms\\finetuning\\model",
-                // "mistral-7b-openorca.Q4_0.gguf",
-                // "causallm_14b.Q4_0.gguf",
-                // "openhermes-2-mistral-7b.Q4_0.gguf",
-                // "zephyr-7b-beta.Q5_K_M.gguf",
-                // "dolphin-2.2.1-mistral-7b.Q5_K_M.gguf",
-                // "agentlm-7b.Q5_K_M.gguf",
+                // "..\\..\\llms\\finetuning\\model",
+
                 // "TheBloke\\OpenHermes-2.5-Mistral-7B-GGUF\\openhermes-2.5-mistral-7b.Q5_K_M.gguf",
                 // "TheBloke\\openchat\\openchat_3.5.Q5_K_M.gguf",
-                // "deepseek-coder-6.7b-instruct.Q5_K_M.gguf",
+                // "TheBloke\\openchat-3.5-1210\\openchat-3.5-1210.Q5_K_M.gguf",
+
+                "openchat\\openchat-3.5-1210.Q5_K_M.gguf",
+                // "nous-capybara\\nous-capybara-7b-v1.9.Q5_K_M.gguf",
+                // "phi-2\\phi-2.Q5_K_M.gguf",
+                // "mixtral\\mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf",
+
+                // llama.cpp
                 "--n_ctx",
                 "8192",
                 // "16384",
                 // "2048",
-                "--lora-dir",
-                "..\\llms\\finetuning\\checkpoints\\2023-12-03-20-16-50-agent-instruct",
-                "--lora",
-                "checkpoint-180",
+                
                 "--n-gpu-layers",
-                "1000000000",
-                "--load-in-4bit",
-                "--use_fast",
+                "100",
+
+                // // finetuned
+                // "--lora-dir",
+                // "..\\llms\\finetuning\\checkpoints\\2023-12-03-20-16-50-agent-instruct",
+                // "--lora",
+                // "checkpoint-180",
+                // "--load-in-4bit",
+
                 // "--use_flash_attention_2",
+                
+                "--use_fast",
                 "--api",
+                // "--listen",
                 "--extensions",
                 "openai",
                 // "ngrok"
