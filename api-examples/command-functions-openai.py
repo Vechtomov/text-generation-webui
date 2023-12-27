@@ -66,6 +66,9 @@ def execute_python_code(code: str):
     Args:
         code (string): Python code to execute.
     """
+    if not code:
+        return "Code shouldn't be empty"
+
     old_stdout = sys.stdout  # Save the current stdout
     new_stdout = io.StringIO()  # Create a string buffer to capture output
     sys.stdout = new_stdout
@@ -80,7 +83,7 @@ def execute_python_code(code: str):
         sys.stdout = old_stdout  # Restore original stdout
 
 
-@command
+# @command
 def write_file(filename: str, text: str):
     """
     Writes text to the specified file.
@@ -97,7 +100,7 @@ def write_file(filename: str, text: str):
         return error_message
 
 
-@command
+# @command
 def read_file(filename: str):
     """
     Reads and returns content from a file.
@@ -124,7 +127,7 @@ def finish(result: str):
     print("Task result: ", result)
 
 
-@command
+# @command
 def ask_user(question: str):
     """
     Ask the user a question. Use this command only if you get stuck.
@@ -195,10 +198,38 @@ def generate_functions_list():
                 "type": "object",
                 "properties": {
                     "thoughts": {
-                        "type": "string",
+                        "type": "object",
                         "description": "Your thoughts about user's task and what command could fit this task.",
+                        "properties": {
+                            "observations": {
+                                "description": "Relevant observations from your last action (if any)",
+                                "type": "string",
+                                "required": True,
+                            },
+                            "reasoning": {
+                                "description": "Thoughts",
+                                "type": "string",
+                                "required": True,
+                            },
+                            "self_criticism": {
+                                "description": "Constructive self-criticism",
+                                "type": "string",
+                                "required": True,
+                            },
+                            "plan": {
+                                "description": "Short markdown-style bullet list that conveys the long-term plan",
+                                "type": "string",
+                                "required": True,
+                            },
+                            "speak": {
+                                "description": "Summary of thoughts, to say to user",
+                                "type": "string",
+                                "required": True,
+                            },
+                        },
                     },
                     "command": {
+                        "description": "Command that will be executed",
                         "type": "",
                         "oneOf": command_list,
                     },
@@ -216,17 +247,21 @@ def run_conversation():
     messages = [
         {
             "role": "system",
-            "content": f"""You are an autonomous task solver. You solve user's tasks step by step by creating commands that will be executed. 
-After sending a command you get the command results or user's instructions.
+            "content": f"""You are a 200 IQ genius. 
+You have Sherlock Holmes and Tony Stark minds combined.
+Your reasoning skills and python knowledge are fantastic.
+If you fail, you don't give up, explore hypothesis and learn on given result.
+You solve user's tasks step by step by creating commands that will be executed. 
+After sending the command you will get the command results or user's instructions.
 Given the current conversation you decide what command should be executed next and send this command to user.
 You don't ask user questions until you get really stuck.
-The list of the commands you can create:
+The list of the commands you can use:
 {generate_commands_message()}
 """,
         },
         {
             "role": "user",
-            "content": "I have a task for you in some txt file.",
+            "content": "I have a task for you but I don't remember the filename of the task file. Look in the current directory",
         },
     ]
 
@@ -240,8 +275,17 @@ The list of the commands you can create:
         response_message = response["choices"][0]["message"]
         messages.append(response_message)
 
-        function_args = json.loads(response_message["function_call"]["arguments"])
-        command_name, command_result = create_command(**function_args)
+        try:
+            function_args = json.loads(response_message["function_call"]["arguments"])
+            command_name, command_result = create_command(**function_args)
+        except KeyboardInterrupt:
+            return
+        except:
+            print(traceback.format_exc())
+            print()
+            print("Response: ", response_message)
+            command_name = None
+            command_result = "Invalid function call"
 
         if command_name is not None and command_name != "finish":
             messages.append(
