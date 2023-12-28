@@ -13,13 +13,13 @@ instruction_template: |-
           {{- '' + message['content'] + '' -}}
       {%- else -%}
           {%- if message['role'] == 'user' -%}
-              {{-'GPT4 Correct User: ' + message['content'] + '<|end_of_turn|>'-}}
+              {{-'Alice: ' + message['content'] + '\n'-}}
           {%- else -%}
-              {{-'GPT4 Correct Assistant: ' + message['content'] + '<|end_of_turn|>' -}}
+              {{-'Bob: ' + message['content'] + '\n' -}}
           {%- endif -%}
       {%- endif -%}
   {%- endfor -%}
   {%- if add_generation_prompt -%}
-      {{-'GPT4 Correct Assistant:'-}}
+      {{-'Bob:'-}}
   {%- endif -%}
 
