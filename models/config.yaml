@@ -192,3 +192,7 @@
   instruction_template: 'Synthia'
 .*phi.*:
   instruction_template: 'Phi'
+.*Capybara.*:
+  instruction_template: 'Capybara'
+.*solar.*:
+  instruction_template: 'ChatML'
