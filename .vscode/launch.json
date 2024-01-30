@@ -7,53 +7,57 @@
             "request": "launch",
             "program": "${workspaceFolder}/server.py",
             "cwd": "${workspaceFolder}",
+            // "env": {
+            //     "CUDA_LAUNCH_BLOCKING": "1"
+            // },
             "args": [
                 "--model-dir",
                 // "${workspaceFolder}\\models",
-                "${workspaceFolder}/models",
-                // "D:\\models",
+                // "${workspaceFolder}/models",
+                "D:\\models",
 
                 "--model",
                 // "Capybara-7B-V1.9-Q5_K_M.gguf",
                 // "nous-hermes-2-solar-10.7b.Q4_K_M.gguf",
                 // "microsoft_phi-2",
                 // "mistralai_Mistral-7B-Instruct-v0.2",
-                "TencentARC_LLaMA-Pro-8B-Instruct",
-
                 // "..\\..\\llms\\finetuning\\model",
-
                 // "TheBloke\\OpenHermes-2.5-Mistral-7B-GGUF\\openhermes-2.5-mistral-7b.Q5_K_M.gguf",
                 // "TheBloke\\openchat\\openchat_3.5.Q5_K_M.gguf",
                 // "TheBloke\\openchat-3.5-1210\\openchat-3.5-1210.Q5_K_M.gguf",
-
                 // "openchat\\openchat-3.5-1210.Q5_K_M.gguf",
                 // "nous-capybara\\nous-capybara-7b-v1.9.Q5_K_M.gguf",
                 // "phi-2\\phi-2.Q5_K_M.gguf",
                 // "mixtral\\mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf",
+                "TomGrc_FusionNet_7Bx2_MoE_14B",
+                // "mlabonne_NeuralBeagle14-7B",
+                // "yunconglong_Truthful_DPO_TomGrc_FusionNet_7Bx2_MoE_13B",
+                // "NousResearch_Nous-Hermes-2-SOLAR-10.7B",
 
                 // // llama.cpp
                 // "--n_ctx",
-                // // "2048",
-                // "4096",
+                // "2048",
+                // // "4096",
                 // // "8192",
                 // // "16384",
-                
                 // "--n-gpu-layers",
-                // "100",
+                // // "100",
+                // "13",
 
                 // // finetuned
                 // "--lora-dir",
-                // "../llms/finetuning/checkpoints/2024-01-05-18-43-33-agent-instruct",
+                // // "../llms/finetuning/checkpoints/2024-01-05-18-43-33-agent-instruct",
+                // "../llms/finetuning/checkpoints/2024-01-21-21-21-49-TomGrc_FusionNet_7Bx2_MoE_14B-agent-instruct",
                 // "--lora",
-                // "checkpoint-70",
+                // "checkpoint-200",
 
-                // // huggingface
+                // huggingface
                 "--load-in-4bit",
-                // "--use_flash_attention_2",
+                "--use_flash_attention_2",
                 "--trust-remote-code",
-                
+
                 "--api",
-                // "--listen",
+                "--listen",
                 "--extensions",
                 "openai",
                 // "ngrok"
