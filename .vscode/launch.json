@@ -3,46 +3,37 @@
     "configurations": [
         {
             "name": "Debug Server",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/server.py",
             "cwd": "${workspaceFolder}",
-            // "env": {
-            //     "CUDA_LAUNCH_BLOCKING": "1"
-            // },
+            "env": {
+                // "CUDA_LAUNCH_BLOCKING": "1"
+                "CUDA_VISIBLE_DEVICES": "0",
+            },
             "args": [
                 "--model-dir",
-                // "${workspaceFolder}\\models",
                 // "${workspaceFolder}/models",
-                "D:\\models",
+                "${env:HOME}/models",
 
                 "--model",
-                // "Capybara-7B-V1.9-Q5_K_M.gguf",
-                // "nous-hermes-2-solar-10.7b.Q4_K_M.gguf",
-                // "microsoft_phi-2",
-                // "mistralai_Mistral-7B-Instruct-v0.2",
-                // "..\\..\\llms\\finetuning\\model",
-                // "TheBloke\\OpenHermes-2.5-Mistral-7B-GGUF\\openhermes-2.5-mistral-7b.Q5_K_M.gguf",
-                // "TheBloke\\openchat\\openchat_3.5.Q5_K_M.gguf",
-                // "TheBloke\\openchat-3.5-1210\\openchat-3.5-1210.Q5_K_M.gguf",
-                // "openchat\\openchat-3.5-1210.Q5_K_M.gguf",
-                // "nous-capybara\\nous-capybara-7b-v1.9.Q5_K_M.gguf",
-                // "phi-2\\phi-2.Q5_K_M.gguf",
-                // "mixtral\\mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf",
-                "TomGrc_FusionNet_7Bx2_MoE_14B",
-                // "mlabonne_NeuralBeagle14-7B",
-                // "yunconglong_Truthful_DPO_TomGrc_FusionNet_7Bx2_MoE_13B",
-                // "NousResearch_Nous-Hermes-2-SOLAR-10.7B",
+                // "llama3ins-8b-32k-q8.gguf",
+                // "meta-llama-3-8b-instruct",
+                "llama-3-8b-f16.gguf",
 
-                // // llama.cpp
-                // "--n_ctx",
-                // "2048",
-                // // "4096",
-                // // "8192",
-                // // "16384",
-                // "--n-gpu-layers",
-                // // "100",
-                // "13",
+                // llama.cpp
+                "--n_ctx",
+                "8192",
+                // "16384",
+                "--n-gpu-layers",
+                "1000",
+                "--flash-attn",
+                "--tensorcores",
+
+                // // huggingface
+                // // "--load-in-4bit",
+                // "--use_flash_attention_2",
+                // "--trust-remote-code",
 
                 // // finetuned
                 // "--lora-dir",
@@ -51,15 +42,10 @@
                 // "--lora",
                 // "checkpoint-200",
 
-                // huggingface
-                "--load-in-4bit",
-                "--use_flash_attention_2",
-                "--trust-remote-code",
-
                 "--api",
+                "--api-port",
+                "9002",
                 "--listen",
-                "--extensions",
-                "openai",
                 // "ngrok"
             ],
             "justMyCode": false,
@@ -67,7 +53,7 @@
         },
         {
             "name": "Current",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "cwd": "${workspaceFolder}",
